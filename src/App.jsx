@@ -1,14 +1,16 @@
 import { useState, useRef, useMemo } from "react";
 import useLocalStorage from "./useLocalStorage";
+import { TodosContext } from "./TodosContext";
+import TodoItem from "./TodoItem";
+
 const App = () => {
-  const [todos, setTodos] = useLocalStorage("todos",[
+  const [todos, setTodos] = useLocalStorage("todos", [
     { id: 1, text: "Learn React", done: false },
     { id: 2, text: "Build Todo App", done: false },
     { id: 3, text: "Push to GitHub", done: false },
   ]);
   const [text, setText] = useState("");
 
-  // NEW: handle on the real input element
   const inputRef = useRef(null);
 
   const handleSubmit = (event) => {
@@ -17,7 +19,7 @@ const App = () => {
     const newTodo = { id: Date.now(), text: text, done: false };
     setTodos([...todos, newTodo]);
     setText("");
-    inputRef.current.focus(); // NEW: cursor back to the input
+    inputRef.current.focus();
   };
 
   const handleDelete = (id) => {
@@ -31,58 +33,46 @@ const App = () => {
       )
     );
   };
-const remaining = useMemo(() => {
-  return todos.filter((todo) => !todo.done).length;
-}, [todos]);
+
+  const remaining = useMemo(() => {
+    return todos.filter((todo) => !todo.done).length;
+  }, [todos]);
+
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-md mx-auto bg-white rounded-xl shadow p-6">
-        <h1 className="text-3xl font-bold text-blue-500 mb-6">My Todo App</h1>
-        <p className="text-gray-500 mb-4">{remaining} tasks left</p>
+    <TodosContext.Provider value={{ handleToggle, handleDelete }}>
+      <div className="min-h-screen bg-gray-100 p-8">
+        <div className="max-w-md mx-auto bg-white rounded-xl shadow p-6">
+          <h1 className="text-3xl font-bold text-blue-500 mb-6">My Todo App</h1>
+          <p className="text-gray-500 mb-4">{remaining} tasks left</p>
 
-        <form onSubmit={handleSubmit} className="flex gap-2 mb-6">
-          <input
-            ref={inputRef} // NEW: link the handle to this element
-            className="flex-1 border border-gray-300 p-2 rounded"
-            placeholder="Add a new task..."
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-          />
-          <button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-          >
-            Add
-          </button>
-        </form>
-
-        <ul className="flex flex-col gap-2">
-          {todos.map((todo) => (
-            <li
-              key={todo.id}
-              className="flex justify-between items-center bg-gray-50 border p-3 rounded"
+          <form onSubmit={handleSubmit} className="flex gap-2 mb-6">
+            <input
+              ref={inputRef}
+              className="flex-1 border border-gray-300 p-2 rounded"
+              placeholder="Add a new task..."
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+            />
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
             >
-              <span
-                onClick={() => handleToggle(todo.id)}
-                className={todo.done ? "line-through text-gray-400" : ""}
-              >
-                {todo.text}
-              </span>
-              <button
-                onClick={() => handleDelete(todo.id)}
-                className="text-red-500 hover:text-red-700"
-              >
-                ✕
-              </button>
-            </li>
-          ))}
-        </ul>
+              Add
+            </button>
+          </form>
 
-        {todos.length === 0 && (
-          <p className="text-gray-400 text-center">No tasks yet 🎉</p>
-        )}
+          <ul className="flex flex-col gap-2">
+            {todos.map((todo) => (
+              <TodoItem key={todo.id} todo={todo} />
+            ))}
+          </ul>
+
+          {todos.length === 0 && (
+            <p className="text-gray-400 text-center">No tasks yet 🎉</p>
+          )}
+        </div>
       </div>
-    </div>
+    </TodosContext.Provider>
   );
 };
 
