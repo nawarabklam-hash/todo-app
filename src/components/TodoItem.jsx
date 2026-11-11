@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
-import { TodosContext } from "./TodosContext";
+import { TodosContext } from "../context/TodosContext";
 
 const TodoItem = ({ todo }) => {
   const { handleToggle, handleDelete } = useContext(TodosContext);

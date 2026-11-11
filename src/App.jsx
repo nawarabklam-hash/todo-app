@@ -1,10 +1,10 @@
 import { useState, useRef, useMemo } from "react";
-import useLocalStorage from "./useLocalStorage";
-import { TodosContext } from "./TodosContext";
-import TodoItem from "./TodoItem";
+import useLocalStorage from "./hooks/useLocalStorage";
+import { TodosContext } from "./context/TodosContext";
+import TodoItem from "./components/TodoItem";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import Stats from "./Stats";
-import TodoDetails from "./TodoDetails";
+import Stats from "./pages/Stats";
+import TodoDetails from "./pages/TodoDetails";
 
 const App = () => {
   const [todos, setTodos] = useLocalStorage("todos", [
