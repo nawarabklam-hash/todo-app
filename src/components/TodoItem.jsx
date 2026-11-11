@@ -8,12 +8,12 @@ const TodoItem = ({ todo }) => {
 
   return (
     <li className="flex justify-between items-center bg-gray-50 border p-3 rounded">
-      <span
+    <button
         onClick={() => handleToggle(todo.id)}
         className={todo.done ? "line-through text-gray-400" : ""}
       >
         {todo.text}
-      </span>
+       </button>
       <div className="flex gap-2">
         <Link
           to={`/todo/${todo.id}`}
