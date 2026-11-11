@@ -2,6 +2,9 @@ import { useState, useRef, useMemo } from "react";
 import useLocalStorage from "./useLocalStorage";
 import { TodosContext } from "./TodosContext";
 import TodoItem from "./TodoItem";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import Stats from "./Stats";
+import TodoDetails from "./TodoDetails";
 
 const App = () => {
   const [todos, setTodos] = useLocalStorage("todos", [
@@ -39,39 +42,57 @@ const App = () => {
   }, [todos]);
 
   return (
-    <TodosContext.Provider value={{ handleToggle, handleDelete }}>
-      <div className="min-h-screen bg-gray-100 p-8">
-        <div className="max-w-md mx-auto bg-white rounded-xl shadow p-6">
-          <h1 className="text-3xl font-bold text-blue-500 mb-6">My Todo App</h1>
-          <p className="text-gray-500 mb-4">{remaining} tasks left</p>
+    <TodosContext.Provider value={{ todos, handleToggle, handleDelete }}>
+      <BrowserRouter>
+        <div className="min-h-screen bg-gray-100 p-8">
 
-          <form onSubmit={handleSubmit} className="flex gap-2 mb-6">
-            <input
-              ref={inputRef}
-              className="flex-1 border border-gray-300 p-2 rounded"
-              placeholder="Add a new task..."
-              value={text}
-              onChange={(e) => setText(e.target.value)}
+          <nav className="max-w-md mx-auto flex gap-4 mb-4">
+            <Link to="/" className="text-blue-500 font-bold">Tasks</Link>
+            <Link to="/stats" className="text-blue-500 font-bold">Stats</Link>
+          </nav>
+
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <div className="max-w-md mx-auto bg-white rounded-xl shadow p-6">
+                  <h1 className="text-3xl font-bold text-blue-500 mb-6">My Todo App</h1>
+                  <p className="text-gray-500 mb-4">{remaining} tasks left</p>
+
+                  <form onSubmit={handleSubmit} className="flex gap-2 mb-6">
+                    <input
+                      ref={inputRef}
+                      className="flex-1 border border-gray-300 p-2 rounded"
+                      placeholder="Add a new task..."
+                      value={text}
+                      onChange={(e) => setText(e.target.value)}
+                    />
+                    <button
+                      type="submit"
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                    >
+                      Add
+                    </button>
+                  </form>
+
+                  <ul className="flex flex-col gap-2">
+                    {todos.map((todo) => (
+                      <TodoItem key={todo.id} todo={todo} />
+                    ))}
+                  </ul>
+
+                  {todos.length === 0 && (
+                    <p className="text-gray-400 text-center">No tasks yet 🎉</p>
+                  )}
+                </div>
+              }
             />
-            <button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-            >
-              Add
-            </button>
-          </form>
+            <Route path="/stats" element={<Stats />} />
+            <Route path="/todo/:id" element={<TodoDetails />} />
+          </Routes>
 
-          <ul className="flex flex-col gap-2">
-            {todos.map((todo) => (
-              <TodoItem key={todo.id} todo={todo} />
-            ))}
-          </ul>
-
-          {todos.length === 0 && (
-            <p className="text-gray-400 text-center">No tasks yet 🎉</p>
-          )}
         </div>
-      </div>
+      </BrowserRouter>
     </TodosContext.Provider>
   );
 };
